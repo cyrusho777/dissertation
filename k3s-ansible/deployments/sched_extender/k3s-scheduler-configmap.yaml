@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k3s-scheduler-configuration
+  namespace: kube-system
+data:
+  k3s-scheduler-config.yaml: |
+    apiVersion: kubescheduler.config.k8s.io/v1
+    kind: KubeSchedulerConfiguration
+    clientConnection:
+      kubeconfig: /etc/rancher/k3s/k3s.yaml
+    extenders:
+    - urlPrefix: "http://scheduler-extender.kube-system.svc.cluster.local:8888"
+      filterVerb: "filter"
+      prioritizeVerb: "prioritize"
+      weight: 1
+      enableHTTPS: false
+      nodeCacheCapable: false
+      httpTimeout: 30s
+      managedResources:
+      - name: "scheduler.extender/cpu-memory"
+        ignoredByScheduler: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k3s-scheduler-integration-guide
+  namespace: kube-system
+data:
+  README.md: |
+    # K3s Scheduler Extender Integration Guide
+    
+    This ConfigMap contains the configuration needed to integrate your scheduler extender
+    with the K3s scheduler.
+    
+    ## Option 1: Use with systemd K3s service
+    
+    1. Copy the scheduler config:
+       ```
+       sudo mkdir -p /etc/rancher/k3s
+       sudo cp /etc/kubernetes/scheduler/k3s-scheduler-config.yaml /etc/rancher/k3s/
+       ```
+    
+    2. Edit the K3s service file:
+       ```
+       sudo systemctl edit k3s.service
+       ```
+       
+       Add the following:
+       ```
+       [Service]
+       Environment="K3S_KUBE_SCHEDULER_ARG=--config=/etc/rancher/k3s/k3s-scheduler-config.yaml"
+       ```
+    
+    3. Restart K3s service:
+       ```
+       sudo systemctl daemon-reload
+       sudo systemctl restart k3s
+       ```
+    
+    ## Option 2: Mount the configuration file
+    
+    If K3s is running in a container, mount this ConfigMap to:
+    `/var/lib/rancher/k3s/server/manifests/scheduler-config.yaml`
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k3s-scheduler-config-setup
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      serviceAccountName: scheduler-extender-sa
+      containers:
+      - name: config-setup
+        image: bitnami/kubectl:latest
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          set -e
+          
+          # Copy the ConfigMap to a place where k3s might read it
+          kubectl get configmap k3s-scheduler-configuration -n kube-system -o jsonpath='{.data.k3s-scheduler-config\.yaml}' > /tmp/config.yaml
+          
+          # Detect where k3s is running
+          K3S_NODE=$(kubectl get nodes --selector="node-role.kubernetes.io/master" -o jsonpath='{.items[0].metadata.name}')
+          
+          if [ -n "$K3S_NODE" ]; then
+            echo "Found K3s master node: $K3S_NODE"
+            
+            # Label the node to indicate it needs configuration
+            kubectl label node $K3S_NODE scheduler-extender/config-needed=true --overwrite
+            
+            # Create a scheduler setup pod that runs on the master node with hostPath
+            cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: scheduler-config-helper
+            namespace: kube-system
+          spec:
+            nodeSelector:
+              kubernetes.io/hostname: $K3S_NODE
+            containers:
+            - name: helper
+              image: alpine:latest
+              command: ["/bin/sh", "-c"]
+              args:
+              - |
+                mkdir -p /host/etc/rancher/k3s
+                cp /config/k3s-scheduler-config.yaml /host/etc/rancher/k3s/
+                echo "Configuration copied to K3s directory. Please restart K3s service manually to apply."
+                sleep 3600
+              volumeMounts:
+              - name: host-path
+                mountPath: /host
+              - name: config-volume
+                mountPath: /config
+            volumes:
+            - name: host-path
+              hostPath:
+                path: /
+            - name: config-volume
+              configMap:
+                name: k3s-scheduler-configuration
+          EOF
+            
+            echo "Created helper pod to assist with configuration"
+            echo "Note: You will still need to restart the K3s service manually on the node."
+          else
+            echo "Could not find K3s master node."
+          fi
+      restartPolicy: Never
+  backoffLimit: 1 

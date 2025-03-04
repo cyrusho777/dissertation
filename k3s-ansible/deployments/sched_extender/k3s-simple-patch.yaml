@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k3s-scheduler-patch
+  namespace: kube-system
+  labels:
+    component: k3s-scheduler-patch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: k3s-scheduler-patch
+  template:
+    metadata:
+      labels:
+        component: k3s-scheduler-patch
+    spec:
+      serviceAccountName: scheduler-extender-sa
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: patch-container
+        image: alpine:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          # Create directories
+          mkdir -p /etc/kubernetes/scheduler
+          
+          # Create policy file
+          cat > /etc/kubernetes/scheduler/policy.json << 'EOF'
+          {
+            "kind": "Policy",
+            "apiVersion": "v1",
+            "extenders": [
+              {
+                "urlPrefix": "http://scheduler-extender.kube-system.svc.cluster.local:8888",
+                "filterVerb": "filter",
+                "prioritizeVerb": "prioritize",
+                "weight": 1,
+                "enableHTTPS": false,
+                "nodeCacheCapable": false,
+                "httpTimeout": 30000000000
+              }
+            ]
+          }
+          EOF
+          
+          echo "Policy file created:"
+          cat /etc/kubernetes/scheduler/policy.json
+          
+          # Install kubectl
+          apk add --no-cache curl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/
+          
+          # Create ConfigMap
+          kubectl create configmap k3s-scheduler-policy -n kube-system --from-file=policy.json=/etc/kubernetes/scheduler/policy.json --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Create configmap with instructions
+          kubectl create configmap k3s-scheduler-instructions -n kube-system --from-literal=message="To enable the scheduler extender, run: sudo systemctl edit k3s.service and add Environment='K3S_KUBE_SCHEDULER_ARG=--policy-config-file=/etc/kubernetes/scheduler/policy.json'" --dry-run=client -o yaml | kubectl apply -f -
+          
+          echo "ConfigMap created with policy"
+          echo "Keep container running to serve logs"
+          tail -f /dev/null
+        volumeMounts:
+        - name: kubernetes-dir
+          mountPath: /etc/kubernetes
+      volumes:
+      - name: kubernetes-dir
+        hostPath:
+          path: /etc/kubernetes
+          type: DirectoryOrCreate 

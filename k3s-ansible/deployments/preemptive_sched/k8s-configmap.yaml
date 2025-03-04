@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: preemptive-scheduler-config
+  namespace: kube-system
+data:
+  config.yaml: |
+    preemption: true
+    alpha: 0.8
+    node: ""  # Empty means it will be set by downward API
+    prometheus_url: "http://prometheus-server.default.svc.cluster.local:80/api/v1/query" 

@@ -1,0 +1,141 @@
+{
+  "test_start": "2025-03-03T01:18:55.389123",
+  "test_end": "2025-03-03T01:18:57.524034",
+  "test_duration_seconds": 2.134911060333252,
+  "num_pods": 3,
+  "cpu_request": "100m",
+  "memory_request": "128Mi",
+  "scheduled_pods": [
+    "multi-resource-pod-0",
+    "multi-resource-pod-1",
+    "multi-resource-pod-2"
+  ],
+  "unscheduled_pods": [],
+  "pod_status": {
+    "multi-resource-pod-0": {
+      "phase": "Pending",
+      "node": "dev-cpu-cwkh2a",
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "False",
+          "reason": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null
+        }
+      ]
+    },
+    "multi-resource-pod-1": {
+      "phase": "Pending",
+      "node": "dev-cpu-cwkh2a",
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "False",
+          "reason": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null
+        }
+      ]
+    },
+    "multi-resource-pod-2": {
+      "phase": "Pending",
+      "node": "dev-cpu-cwkh2a",
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "False",
+          "reason": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null
+        }
+      ]
+    }
+  },
+  "node_status": {
+    "dev-cpu-cwkh2a": {
+      "capacity": {
+        "cpu": "6",
+        "memory": "32836168Ki"
+      },
+      "allocatable": {
+        "cpu": "6",
+        "memory": "32836168Ki"
+      }
+    },
+    "dev-cpu-cwkh2b": {
+      "capacity": {
+        "cpu": "6",
+        "memory": "32836152Ki"
+      },
+      "allocatable": {
+        "cpu": "6",
+        "memory": "32836152Ki"
+      }
+    },
+    "dev-cpu-cwkh2c": {
+      "capacity": {
+        "cpu": "6",
+        "memory": "32836148Ki"
+      },
+      "allocatable": {
+        "cpu": "6",
+        "memory": "32836148Ki"
+      }
+    }
+  }
+}

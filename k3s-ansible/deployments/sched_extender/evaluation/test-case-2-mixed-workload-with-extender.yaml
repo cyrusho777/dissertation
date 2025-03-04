@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sched-test-mixed-extender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: high-cpu-low-memory
+  namespace: sched-test-mixed-extender
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: high-cpu-low-memory
+  template:
+    metadata:
+      labels:
+        app: high-cpu-low-memory
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "1"
+          limits:
+            memory: "256Mi"
+            cpu: "1.5"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: low-cpu-high-memory
+  namespace: sched-test-mixed-extender
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: low-cpu-high-memory
+  template:
+    metadata:
+      labels:
+        app: low-cpu-high-memory
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "100m"
+          limits:
+            memory: "1.5Gi"
+            cpu: "200m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medium-resources
+  namespace: sched-test-mixed-extender
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: medium-resources
+  template:
+    metadata:
+      labels:
+        app: medium-resources
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "768Mi"
+            cpu: "700m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: small-resources
+  namespace: sched-test-mixed-extender
+spec:
+  replicas: 15
+  selector:
+    matchLabels:
+      app: small-resources
+  template:
+    metadata:
+      labels:
+        app: small-resources
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m" 

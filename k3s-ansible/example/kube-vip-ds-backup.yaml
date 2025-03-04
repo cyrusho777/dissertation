@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: "2"
+    objectset.rio.cattle.io/applied: H4sIAAAAAAAA/5xUX2/rtg/9Kj/w2cl1kt7+MfB7CNY8FFuDi5tiw1AEAS0xjhZZ8ijabVD4uw9yktbpbW6Hvcnk0eERfcgXwMr8ThyMd5ABVlX40owgga1xGjK4RSq9W5BAAiUJahSE7AXQOS8oxrsQP33+FykJJEM2fqhQxNLQ+C8mckByNu+fHPGgaLaQwXYSeplmlPzvV+P0/6dae/cphcOSIIPGVP8KGipUEb+tcxqEXRAqoU3AYk72pw/aYNhABqOxTtObqzTVN+s8v1qnSqkJrS9zHGH69Sq9vtFX6Wh9GUkP0rpSjakGOsA+eEZEqEhFCYEsKfEczyWK2vz2qu4DyrZNQKisLAp1N3o/y3528VgS12vjjOw6qNc07X0z/V0bJn1bs3HFQm1I19a44q5w/jU8eyZVS+elPcPi8IgH4jJA9nh4yuy5Ygphb5/HF9jSDrLuwoC9pWEUyI6EQmx6iUGI44+tiLFrCcyeTZAA7bJN/hOn8k7Y20Fl0dE56mUbuxOhaBzxnhe5iAco0WFBDMsEyDVd6s2FK+ToxAZtHSPCNUFUekDkRbUih7mlHmiNNpygKs/Sy19eXEz66VhGGc09yGTcB6gPirxXoqrVmxffYKeePCmptQs/Ux0a9XnZSGQJNXFnENON+CfgQLpmfIcdfX2PZHL0pAm1Na4vYZT+iBTeVcTG6x7upIWodTRVn2Z8PRxPxsPLm+HoYgTtMgFTYhFTxUZx9NZxvF4PWZMOr4djOEC/1dZ+89aoaNCpfcLdcSX0ZhMSYAq+ZkVxdOOUkqrZyO4X74SeJY6YwgpzY42YDhTlRmvOZw+r6e393RyS7vx9+gcksPhzsXq4u59BtPUygY0PMid58ryFLPY8luDGKJoq5Wsn8x8UibfEx7X/+AK0XpMSyGDuDxvhzCwlJ9j9mjg7dm0CdaVRaCGMQkXcP92aEpS6e6eqmcnJvC5z4mNlDVmagKYQ19RHKdfF7k0IH4S/E+odZGnb/hMAAP//GhmtCxQHAAA
+    objectset.rio.cattle.io/id: ""
+    objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+    objectset.rio.cattle.io/owner-name: vip
+    objectset.rio.cattle.io/owner-namespace: kube-system
+  creationTimestamp: "2025-02-24T22:20:53Z"
+  generation: 2
+  labels:
+    objectset.rio.cattle.io/hash: 12d009700d9fbb7f0ccc3ef6ba1a057089d701f6
+  name: kube-vip
+  namespace: kube-system
+  resourceVersion: "448151"
+  uid: 5b822b08-cdd2-4975-83bb-4b49486ead82
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: kube-vip
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: kube-vip
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: Exists
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      containers:
+      - args:
+        - manager
+        env:
+        - name: vip_arp
+          value: "true"
+        - name: vip_interface
+          value: enX0
+        - name: bgp_enable
+          value: "false"
+        - name: port
+          value: "6443"
+        - name: vip_cidr
+          value: "32"
+        - name: cp_enable
+          value: "true"
+        - name: cp_namespace
+          value: kube-system
+        - name: vip_ddns
+          value: "false"
+        - name: svc_enable
+          value: "true"
+        - name: vip_leaderelection
+          value: "true"
+        - name: vip_leaseduration
+          value: "15"
+        - name: vip_renewdeadline
+          value: "10"
+        - name: vip_retryperiod
+          value: "2"
+        - name: address
+          value: 128.232.69.141
+        image: ghcr.io/kube-vip/kube-vip:v0.8.2
+        imagePullPolicy: Always
+        name: kube-vip
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+            - SYS_TIME
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: kube-vip
+      serviceAccountName: kube-vip
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 1
+  desiredNumberScheduled: 1
+  numberAvailable: 1
+  numberMisscheduled: 0
+  numberReady: 1
+  observedGeneration: 2
+  updatedNumberScheduled: 1

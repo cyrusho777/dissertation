@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k3s-scheduler-patch
+  namespace: kube-system
+  labels:
+    component: k3s-scheduler-patch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: k3s-scheduler-patch
+  template:
+    metadata:
+      labels:
+        component: k3s-scheduler-patch
+    spec:
+      serviceAccountName: scheduler-extender-sa
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+      - name: patch-container
+        image: rancher/k3s:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          set -e
+          
+          # Create directories to store scheduler config
+          mkdir -p /etc/kubernetes/scheduler
+          
+          # Copy the extender policy
+          cat > /etc/kubernetes/scheduler/policy.json << 'EOF'
+          {
+            "kind": "Policy",
+            "apiVersion": "v1",
+            "extenders": [
+              {
+                "urlPrefix": "http://scheduler-extender.kube-system.svc.cluster.local:8888",
+                "filterVerb": "filter",
+                "prioritizeVerb": "prioritize", 
+                "weight": 1,
+                "enableHTTPS": false,
+                "nodeCacheCapable": false,
+                "httpTimeout": 30000000000,
+                "managedResources": [
+                  {
+                    "name": "scheduler.extender/cpu-memory",
+                    "ignoredByScheduler": false
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
+          
+          echo "Scheduler policy created at /etc/kubernetes/scheduler/policy.json"
+          cat /etc/kubernetes/scheduler/policy.json
+          
+          # Find k3s process
+          K3S_PID=$(ps -ef | grep "k3s server" | grep -v grep | awk '{print $2}')
+          
+          if [ -n "$K3S_PID" ]; then
+            echo "Found K3s server process with PID: $K3S_PID"
+            
+            # Check if already patched
+            if grep -q -- "--policy-config-file" /proc/$K3S_PID/cmdline; then
+              echo "K3s already configured with policy file. No changes needed."
+            else
+              # Create a systemd drop-in file to add our arguments
+              mkdir -p /etc/systemd/system/k3s.service.d/
+              cat > /etc/systemd/system/k3s.service.d/10-scheduler-extender.conf << EOF
+              [Service]
+              Environment="K3S_KUBE_SCHEDULER_ARG=--policy-config-file=/etc/kubernetes/scheduler/policy.json"
+              EOF
+              
+              echo "Created systemd drop-in file for k3s scheduler arguments"
+              echo "Reloading systemd and restarting the k3s process"
+              
+              # Reload systemd and restart k3s
+              systemctl daemon-reload
+              systemctl restart k3s
+              
+              echo "K3s restarted with scheduler extender config"
+            fi
+          else
+            echo "Could not find K3s server process. Trying alternative method..."
+            
+            # Alternative approach using kubectl patch for k3s-server
+            K3S_NODE=$(kubectl get nodes --selector="node-role.kubernetes.io/master" -o jsonpath='{.items[0].metadata.name}')
+            if [ -n "$K3S_NODE" ]; then
+              echo "Found K3s master node: $K3S_NODE"
+              
+              # Create a ConfigMap with our scheduler policy
+              kubectl create configmap k3s-scheduler-policy -n kube-system --from-file=policy.json=/etc/kubernetes/scheduler/policy.json --dry-run=client -o yaml | kubectl apply -f -
+              
+              # Apply a label to the node to indicate it's been patched
+              kubectl label node $K3S_NODE scheduler.extender/patched=true --overwrite
+              
+              # Create a notification message
+              kubectl create configmap scheduler-restart-required -n kube-system --from-literal=message="Please restart the k3s service on node $K3S_NODE to apply scheduler extender" --dry-run=client -o yaml | kubectl apply -f -
+              
+              echo "Created ConfigMap with instructions. A controlled restart of the k3s service is required."
+            else
+              echo "Could not find K3s master node."
+            fi
+          fi
+          
+          # Keep container running for logs
+          echo "Patch process completed. Keeping container alive for logs..."
+          tail -f /dev/null
+        volumeMounts:
+        - name: host-root
+          mountPath: /host
+        - name: kubernetes-dir
+          mountPath: /etc/kubernetes
+        - name: systemd-dir
+          mountPath: /etc/systemd/system
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
+      - name: kubernetes-dir
+        hostPath:
+          path: /etc/kubernetes
+          type: DirectoryOrCreate
+      - name: systemd-dir
+        hostPath:
+          path: /etc/systemd/system
+          type: DirectoryOrCreate 

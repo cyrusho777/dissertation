@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  annotations:
+    kube-vip.io/loadbalancerIPs: 128.232.69.143  # Specify the desired external IP
+spec:
+  ipFamilyPolicy: SingleStack
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
+  loadBalancerIP: 128.232.69.143                 # Optional: Specify the desired external IP

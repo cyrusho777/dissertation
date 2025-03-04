@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sched-test-extender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-intensive
+  namespace: sched-test-extender
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cpu-intensive
+  template:
+    metadata:
+      labels:
+        app: cpu-intensive
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "2"
+          limits:
+            memory: "256Mi"
+            cpu: "2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-intensive
+  namespace: sched-test-extender
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: memory-intensive
+  template:
+    metadata:
+      labels:
+        app: memory-intensive
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "0.5"
+          limits:
+            memory: "1Gi"
+            cpu: "0.5"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balanced
+  namespace: sched-test-extender
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: balanced
+  template:
+    metadata:
+      labels:
+        app: balanced
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "1"
+          limits:
+            memory: "512Mi"
+            cpu: "1" 

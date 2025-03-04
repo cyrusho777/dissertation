@@ -1,0 +1,48 @@
+{
+  "default_scheduler": {
+    "dev-cpu-cwkh2a": {
+      "cpu_capacity": 6.0,
+      "memory_capacity": 33624236032.0,
+      "cpu_used": 0,
+      "memory_used": 0,
+      "pods": []
+    },
+    "dev-cpu-cwkh2b": {
+      "cpu_capacity": 6.0,
+      "memory_capacity": 33624219648.0,
+      "cpu_used": 0,
+      "memory_used": 0,
+      "pods": []
+    },
+    "dev-cpu-cwkh2c": {
+      "cpu_capacity": 6.0,
+      "memory_capacity": 33624215552.0,
+      "cpu_used": 0,
+      "memory_used": 0,
+      "pods": []
+    }
+  },
+  "scheduler_with_extender": {
+    "dev-cpu-cwkh2a": {
+      "cpu_capacity": 6.0,
+      "memory_capacity": 33624236032.0,
+      "cpu_used": 0,
+      "memory_used": 0,
+      "pods": []
+    },
+    "dev-cpu-cwkh2b": {
+      "cpu_capacity": 6.0,
+      "memory_capacity": 33624219648.0,
+      "cpu_used": 0,
+      "memory_used": 0,
+      "pods": []
+    },
+    "dev-cpu-cwkh2c": {
+      "cpu_capacity": 6.0,
+      "memory_capacity": 33624215552.0,
+      "cpu_used": 0,
+      "memory_used": 0,
+      "pods": []
+    }
+  }
+}

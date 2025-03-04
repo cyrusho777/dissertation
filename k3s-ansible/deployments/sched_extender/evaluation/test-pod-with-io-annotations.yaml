@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: io-annotated-pod
+  namespace: default
+  annotations:
+    # Disk read: 30 MB/s
+    scheduler.extender/disk-read: "30M"
+    # Disk write: 15 MB/s
+    scheduler.extender/disk-write: "15M"
+    # Network upload: 5 MB/s
+    scheduler.extender/net-up: "5M"
+    # Network download: 10 MB/s
+    scheduler.extender/net-down: "10M"
+spec:
+  containers:
+  - name: sample-container
+    image: nginx:latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "512Mi"
+      limits:
+        cpu: "2"
+        memory: "1Gi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  namespace: default
+  annotations:
+    # MySQL has high disk I/O needs
+    scheduler.extender/disk-read: "120M"
+    scheduler.extender/disk-write: "50M"
+    scheduler.extender/net-up: "5M"
+    scheduler.extender/net-down: "10M"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+      annotations:
+        # These annotations are propagated to the pods
+        scheduler.extender/disk-read: "120M" 
+        scheduler.extender/disk-write: "50M"
+        scheduler.extender/net-up: "5M"
+        scheduler.extender/net-down: "10M"
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "example-password"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+      annotations:
+        # API server has high network I/O needs
+        scheduler.extender/disk-read: "20M"
+        scheduler.extender/disk-write: "10M"
+        scheduler.extender/net-up: "100M"
+        scheduler.extender/net-down: "200M"
+    spec:
+      containers:
+      - name: api
+        image: node:latest
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+---
+# This pod has no explicit I/O annotations
+# The scheduler will estimate requirements based on
+# container image and resource requests
+apiVersion: v1
+kind: Pod
+metadata:
+  name: auto-estimated-pod
+  namespace: default
+spec:
+  containers:
+  - name: redis
+    image: redis:latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi" 

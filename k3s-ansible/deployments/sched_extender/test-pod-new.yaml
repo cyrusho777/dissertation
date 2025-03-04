@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scheduler-test-pod-debug
+  labels:
+    app: scheduler-test-debug
+  annotations:
+    scheduler-test: "debug-run"
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
+    ports:
+    - containerPort: 80
+  # Add tolerations to allow scheduling on master nodes
+  tolerations:
+  - key: "node-role.kubernetes.io/master"
+    operator: "Exists"
+    effect: "NoSchedule"
+  # Don't restart if the pod fails or completes
+  restartPolicy: Never 

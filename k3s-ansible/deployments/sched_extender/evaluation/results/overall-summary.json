@@ -1,0 +1,41 @@
+{
+  "1": {
+    "description": "Basic Resource Distribution",
+    "results": {
+      "default_scheduler": {
+        "drf_metric": 0.0,
+        "avg_latency": 0
+      },
+      "scheduler_with_extender": {
+        "drf_metric": 0.0,
+        "avg_latency": 0
+      }
+    }
+  },
+  "2": {
+    "description": "Mixed Workload",
+    "results": {
+      "default_scheduler": {
+        "drf_metric": 0.0,
+        "avg_latency": 0
+      },
+      "scheduler_with_extender": {
+        "drf_metric": 0.0,
+        "avg_latency": 0
+      }
+    }
+  },
+  "3": {
+    "description": "Scaling Test",
+    "results": {
+      "default_scheduler": {
+        "drf_metric": 0.0,
+        "avg_latency": 0
+      },
+      "scheduler_with_extender": {
+        "drf_metric": 0.0,
+        "avg_latency": 0
+      }
+    }
+  }
+}

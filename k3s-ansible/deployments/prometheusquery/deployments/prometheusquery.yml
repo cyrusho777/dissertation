@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-monitor
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics-monitor
+  template:
+    metadata:
+      labels:
+        app: metrics-monitor
+    spec:
+      containers:
+      - name: metrics-monitor
+        image: cyrusho777/metrics-monitor:latest
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        env:
+        - name: PROMETHEUS_URL
+          value: "http://prometheus-server.default.svc.cluster.local:80/api/v1/query"

@@ -1,0 +1,62 @@
+{
+  "default": {
+    "latencies": {
+      "default-test-pod-1740961892-0": -0.471044,
+      "default-test-pod-1740961892-1": -0.592974,
+      "default-test-pod-1740961892-2": -0.704475,
+      "default-test-pod-1740961892-3": -0.820084,
+      "default-test-pod-1740961892-4": -0.932792
+    },
+    "makespan": 0.0,
+    "avg_latency": -0.7042738,
+    "median_latency": -0.704475,
+    "p95_latency": -0.49543000000000004,
+    "p99_latency": -0.47592120000000004,
+    "scheduled_count": 5,
+    "submission_count": 5,
+    "submission_times": {
+      "default-test-pod-1740961892-0": "2025-03-03 00:31:32.471044+00:00",
+      "default-test-pod-1740961892-1": "2025-03-03 00:31:32.592974+00:00",
+      "default-test-pod-1740961892-2": "2025-03-03 00:31:32.704475+00:00",
+      "default-test-pod-1740961892-3": "2025-03-03 00:31:32.820084+00:00",
+      "default-test-pod-1740961892-4": "2025-03-03 00:31:32.932792+00:00"
+    },
+    "schedule_times": {
+      "default-test-pod-1740961892-0": "2025-03-03 00:31:32+00:00",
+      "default-test-pod-1740961892-1": "2025-03-03 00:31:32+00:00",
+      "default-test-pod-1740961892-2": "2025-03-03 00:31:32+00:00",
+      "default-test-pod-1740961892-3": "2025-03-03 00:31:32+00:00",
+      "default-test-pod-1740961892-4": "2025-03-03 00:31:32+00:00"
+    }
+  },
+  "preemptive": {
+    "latencies": {
+      "preemptivescheduler-test-pod-1740961905-0": -0.127,
+      "preemptivescheduler-test-pod-1740961905-1": -0.246119,
+      "preemptivescheduler-test-pod-1740961905-2": -0.36205,
+      "preemptivescheduler-test-pod-1740961905-3": 0.522761,
+      "preemptivescheduler-test-pod-1740961905-4": 0.407026
+    },
+    "makespan": 1.0,
+    "avg_latency": 0.038923600000000017,
+    "median_latency": -0.127,
+    "p95_latency": 0.499614,
+    "p99_latency": 0.5181316,
+    "scheduled_count": 5,
+    "submission_count": 5,
+    "submission_times": {
+      "preemptivescheduler-test-pod-1740961905-0": "2025-03-03 00:31:45.127000+00:00",
+      "preemptivescheduler-test-pod-1740961905-1": "2025-03-03 00:31:45.246119+00:00",
+      "preemptivescheduler-test-pod-1740961905-2": "2025-03-03 00:31:45.362050+00:00",
+      "preemptivescheduler-test-pod-1740961905-3": "2025-03-03 00:31:45.477239+00:00",
+      "preemptivescheduler-test-pod-1740961905-4": "2025-03-03 00:31:45.592974+00:00"
+    },
+    "schedule_times": {
+      "preemptivescheduler-test-pod-1740961905-0": "2025-03-03 00:31:45+00:00",
+      "preemptivescheduler-test-pod-1740961905-1": "2025-03-03 00:31:45+00:00",
+      "preemptivescheduler-test-pod-1740961905-2": "2025-03-03 00:31:45+00:00",
+      "preemptivescheduler-test-pod-1740961905-3": "2025-03-03 00:31:46+00:00",
+      "preemptivescheduler-test-pod-1740961905-4": "2025-03-03 00:31:46+00:00"
+    }
+  }
+}

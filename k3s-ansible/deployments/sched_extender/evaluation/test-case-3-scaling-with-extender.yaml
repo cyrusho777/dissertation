@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sched-test-scaling-extender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scaling-test
+  namespace: sched-test-scaling-extender
+spec:
+  replicas: 50
+  selector:
+    matchLabels:
+      app: scaling-test
+  template:
+    metadata:
+      labels:
+        app: scaling-test
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scaling-test-medium
+  namespace: sched-test-scaling-extender
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: scaling-test-medium
+  template:
+    metadata:
+      labels:
+        app: scaling-test-medium
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "300m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-vip-cloud-provider
+  namespace: kube-system
+data:
+  range-global: 128.232.69.142-128.232.69.143  # IP range for VIP assignment
+  arp-enable: "true"  # Enable ARP for IP assignment

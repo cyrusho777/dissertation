@@ -1,0 +1,92 @@
+{
+  "default": {
+    "latencies": {
+      "default-test-pod-1740962223-0": -0.557878,
+      "default-test-pod-1740962223-1": -0.680689,
+      "default-test-pod-1740962223-2": -0.801108,
+      "default-test-pod-1740962223-3": -0.916342,
+      "default-test-pod-1740962223-4": -0.030968,
+      "default-test-pod-1740962223-5": -0.142269,
+      "default-test-pod-1740962223-6": -0.258484,
+      "default-test-pod-1740962223-7": -0.373723,
+      "default-test-pod-1740962223-8": -0.491034,
+      "default-test-pod-1740962223-9": -0.608249
+    },
+    "makespan": 1.0,
+    "avg_latency": -0.4860744,
+    "median_latency": -0.524456,
+    "p95_latency": -0.08105345000000012,
+    "p99_latency": -0.04098508999999999,
+    "scheduled_count": 10,
+    "submission_count": 10,
+    "submission_times": {
+      "default-test-pod-1740962223-0": "2025-03-03 00:37:03.557878+00:00",
+      "default-test-pod-1740962223-1": "2025-03-03 00:37:03.680689+00:00",
+      "default-test-pod-1740962223-2": "2025-03-03 00:37:03.801108+00:00",
+      "default-test-pod-1740962223-3": "2025-03-03 00:37:03.916342+00:00",
+      "default-test-pod-1740962223-4": "2025-03-03 00:37:04.030968+00:00",
+      "default-test-pod-1740962223-5": "2025-03-03 00:37:04.142269+00:00",
+      "default-test-pod-1740962223-6": "2025-03-03 00:37:04.258484+00:00",
+      "default-test-pod-1740962223-7": "2025-03-03 00:37:04.373723+00:00",
+      "default-test-pod-1740962223-8": "2025-03-03 00:37:04.491034+00:00",
+      "default-test-pod-1740962223-9": "2025-03-03 00:37:04.608249+00:00"
+    },
+    "schedule_times": {
+      "default-test-pod-1740962223-0": "2025-03-03 00:37:03+00:00",
+      "default-test-pod-1740962223-1": "2025-03-03 00:37:03+00:00",
+      "default-test-pod-1740962223-2": "2025-03-03 00:37:03+00:00",
+      "default-test-pod-1740962223-3": "2025-03-03 00:37:03+00:00",
+      "default-test-pod-1740962223-4": "2025-03-03 00:37:04+00:00",
+      "default-test-pod-1740962223-5": "2025-03-03 00:37:04+00:00",
+      "default-test-pod-1740962223-6": "2025-03-03 00:37:04+00:00",
+      "default-test-pod-1740962223-7": "2025-03-03 00:37:04+00:00",
+      "default-test-pod-1740962223-8": "2025-03-03 00:37:04+00:00",
+      "default-test-pod-1740962223-9": "2025-03-03 00:37:04+00:00"
+    }
+  },
+  "preemptive": {
+    "latencies": {
+      "preemptivescheduler-test-pod-1740962236-0": 0.145708,
+      "preemptivescheduler-test-pod-1740962236-1": 0.023412,
+      "preemptivescheduler-test-pod-1740962236-2": -0.092986,
+      "preemptivescheduler-test-pod-1740962236-3": -0.209349,
+      "preemptivescheduler-test-pod-1740962236-4": -0.326309,
+      "preemptivescheduler-test-pod-1740962236-5": 0.554905,
+      "preemptivescheduler-test-pod-1740962236-6": 0.437424,
+      "preemptivescheduler-test-pod-1740962236-7": 1.317928,
+      "preemptivescheduler-test-pod-1740962236-8": 1.200127,
+      "preemptivescheduler-test-pod-1740962236-9": 2.080636
+    },
+    "makespan": 3.0,
+    "avg_latency": 0.5131496,
+    "median_latency": 0.291566,
+    "p95_latency": 1.7374173999999993,
+    "p99_latency": 2.0119922800000003,
+    "scheduled_count": 10,
+    "submission_count": 10,
+    "submission_times": {
+      "preemptivescheduler-test-pod-1740962236-0": "2025-03-03 00:37:16.854292+00:00",
+      "preemptivescheduler-test-pod-1740962236-1": "2025-03-03 00:37:16.976588+00:00",
+      "preemptivescheduler-test-pod-1740962236-2": "2025-03-03 00:37:17.092986+00:00",
+      "preemptivescheduler-test-pod-1740962236-3": "2025-03-03 00:37:17.209349+00:00",
+      "preemptivescheduler-test-pod-1740962236-4": "2025-03-03 00:37:17.326309+00:00",
+      "preemptivescheduler-test-pod-1740962236-5": "2025-03-03 00:37:17.445095+00:00",
+      "preemptivescheduler-test-pod-1740962236-6": "2025-03-03 00:37:17.562576+00:00",
+      "preemptivescheduler-test-pod-1740962236-7": "2025-03-03 00:37:17.682072+00:00",
+      "preemptivescheduler-test-pod-1740962236-8": "2025-03-03 00:37:17.799873+00:00",
+      "preemptivescheduler-test-pod-1740962236-9": "2025-03-03 00:37:17.919364+00:00"
+    },
+    "schedule_times": {
+      "preemptivescheduler-test-pod-1740962236-0": "2025-03-03 00:37:17+00:00",
+      "preemptivescheduler-test-pod-1740962236-1": "2025-03-03 00:37:17+00:00",
+      "preemptivescheduler-test-pod-1740962236-2": "2025-03-03 00:37:17+00:00",
+      "preemptivescheduler-test-pod-1740962236-3": "2025-03-03 00:37:17+00:00",
+      "preemptivescheduler-test-pod-1740962236-4": "2025-03-03 00:37:17+00:00",
+      "preemptivescheduler-test-pod-1740962236-5": "2025-03-03 00:37:18+00:00",
+      "preemptivescheduler-test-pod-1740962236-6": "2025-03-03 00:37:18+00:00",
+      "preemptivescheduler-test-pod-1740962236-7": "2025-03-03 00:37:19+00:00",
+      "preemptivescheduler-test-pod-1740962236-8": "2025-03-03 00:37:19+00:00",
+      "preemptivescheduler-test-pod-1740962236-9": "2025-03-03 00:37:20+00:00"
+    }
+  }
+}

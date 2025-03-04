@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k3s-scheduler-config
+  namespace: kube-system
+data:
+  # This is the format K3s expects for its config file
+  config.yaml: |
+    # K3s kubelet configuration
+    apiVersion: kubelet.config.k8s.io/v1beta1
+    kind: KubeletConfiguration
+    # Other kubelet config can go here...
+    
+    ---
+    # K3s kube-scheduler configuration
+    apiVersion: kubescheduler.config.k8s.io/v1
+    kind: KubeSchedulerConfiguration
+    clientConnection:
+      kubeconfig: /var/lib/rancher/k3s/server/cred/scheduler.kubeconfig
+    extenders:
+      - urlPrefix: "http://scheduler-extender.kube-system.svc.cluster.local:8888"
+        filterVerb: "filter"
+        prioritizeVerb: "prioritize"
+        weight: 1
+        enableHTTPS: false
+        nodeCacheCapable: false
+        managedResources:
+        - name: "scheduler.extender/cpu-memory"
+          ignoredByScheduler: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k3s-config-updater
+  namespace: kube-system
+  labels:
+    component: k3s-config-updater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: k3s-config-updater
+  template:
+    metadata:
+      labels:
+        component: k3s-config-updater
+    spec:
+      serviceAccountName: scheduler-extender-sa
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: updater
+        image: alpine:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Install kubectl
+          apk add --no-cache curl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/
+          
+          # Create K3s config directory
+          mkdir -p /var/lib/rancher/k3s/server/etc
+          
+          # Copy the config from ConfigMap
+          kubectl get configmap k3s-scheduler-config -n kube-system -o jsonpath='{.data.config\.yaml}' > /var/lib/rancher/k3s/server/etc/scheduler-config.yaml
+          
+          # Ensure it has the right permissions
+          chmod 0600 /var/lib/rancher/k3s/server/etc/scheduler-config.yaml
+          
+          echo "Config file created at: /var/lib/rancher/k3s/server/etc/scheduler-config.yaml"
+          echo "Contents:"
+          cat /var/lib/rancher/k3s/server/etc/scheduler-config.yaml
+          
+          # Create instruction file for manual step
+          cat > /var/lib/rancher/k3s/server/etc/README.md << 'EOF'
+          # K3s Scheduler Extender Configuration
+
+          The configuration file has been placed at:
+          /var/lib/rancher/k3s/server/etc/scheduler-config.yaml
+
+          To apply this configuration, you need to:
+
+          1. Edit the K3s service configuration:
+             ```
+             sudo vi /etc/systemd/system/k3s.service
+             ```
+
+          2. Find the ExecStart line and add the following flag:
+             ```
+             --kube-scheduler-arg=config=/var/lib/rancher/k3s/server/etc/scheduler-config.yaml
+             ```
+
+          3. Restart K3s:
+             ```
+             sudo systemctl daemon-reload
+             sudo systemctl restart k3s
+             ```
+
+          After restart, verify that the scheduler extender is being used by checking the logs:
+          ```
+          kubectl logs -n kube-system -l component=scheduler-extender
+          ```
+          EOF
+          
+          # Create an informational ConfigMap
+          kubectl create configmap k3s-scheduler-manual-steps -n kube-system --from-file=/var/lib/rancher/k3s/server/etc/README.md --dry-run=client -o yaml | kubectl apply -f -
+          
+          echo "Created instruction ConfigMap 'k3s-scheduler-manual-steps'"
+          echo "Keeping container running to preserve the local file for manual steps..."
+          tail -f /dev/null
+        volumeMounts:
+        - name: rancher-dir
+          mountPath: /var/lib/rancher
+        - name: etc-systemd
+          mountPath: /etc/systemd/system
+      volumes:
+      - name: rancher-dir
+        hostPath:
+          path: /var/lib/rancher
+          type: DirectoryOrCreate
+      - name: etc-systemd
+        hostPath:
+          path: /etc/systemd/system
+          type: DirectoryOrCreate 
