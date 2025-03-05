@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pod-load-generator
+spec:
+  template:
+    spec:
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:latest
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Generate 20 pods with the MultiResource scheduler
+          for i in $(seq 1 20); do
+            cat <<EOF | kubectl apply -f -
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: multiresource-load-$i
+              labels:
+                test: multiresource-load
+            spec:
+              schedulerName: custom-multiresource-scheduler
+              containers:
+              - name: nginx
+                image: nginx:1.19
+                resources:
+                  requests:
+                    cpu: "50m"
+                    memory: "50Mi"
+                  limits:
+                    cpu: "100m"
+                    memory: "100Mi"
+            EOF
+            sleep 0.5
+          done
+          
+          # Generate 20 pods with the Standard scheduler
+          for i in $(seq 1 20); do
+            cat <<EOF | kubectl apply -f -
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: standard-load-$i
+              labels:
+                test: standard-load
+            spec:
+              schedulerName: standard-scheduler
+              containers:
+              - name: nginx
+                image: nginx:1.19
+                resources:
+                  requests:
+                    cpu: "50m"
+                    memory: "50Mi"
+                  limits:
+                    cpu: "100m"
+                    memory: "100Mi"
+            EOF
+            sleep 0.5
+          done
+      restartPolicy: Never
+  backoffLimit: 1 

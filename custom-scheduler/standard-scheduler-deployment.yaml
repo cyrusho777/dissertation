@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: standard-scheduler
+  namespace: kube-system
+  labels:
+    app: standard-scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: standard-scheduler
+  template:
+    metadata:
+      labels:
+        app: standard-scheduler
+    spec:
+      serviceAccountName: custom-scheduler
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      containers:
+      - name: scheduler
+        image: cyrusho777/custom-kube-scheduler:latest
+        imagePullPolicy: Always
+        command:
+        - /bin/kube-scheduler
+        - --config=/etc/kubernetes/scheduler-config.yaml
+        - --v=4
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+        volumeMounts:
+        - name: scheduler-config
+          mountPath: /etc/kubernetes
+      volumes:
+      - name: scheduler-config
+        configMap:
+          name: standard-scheduler-config 

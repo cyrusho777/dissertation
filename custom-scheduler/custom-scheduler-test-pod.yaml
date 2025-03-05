@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: custom-multiresource-test-pod
+  annotations:
+    scheduler.extender/disk-read: "20M"  # 20 MB/s read
+    scheduler.extender/disk-write: "10M" # 10 MB/s write
+    scheduler.extender/net-up: "5M"      # 5 MB/s upload
+    scheduler.extender/net-down: "15M"   # 15 MB/s download
+spec:
+  schedulerName: custom-multiresource-scheduler
+  # Add tolerations for master nodes
+  tolerations:
+  - key: "node-role.kubernetes.io/master"
+    operator: "Exists"
+    effect: "NoSchedule"
+  containers:
+  - name: nginx
+    image: nginx:1.19
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+  terminationGracePeriodSeconds: 0 
